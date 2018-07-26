@@ -1,0 +1,2 @@
+"0","model_age_intel = lm(age_diff ~ intel, "
+"0","               data = data_sd)"

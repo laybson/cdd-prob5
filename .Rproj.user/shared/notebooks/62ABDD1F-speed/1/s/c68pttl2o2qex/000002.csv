@@ -1,0 +1,3 @@
+"0","dados = dados %>% "
+"0","    mutate(votos_log = log10(votos), "
+"0","           gastos_log = log10(total_despesa))"

@@ -1,0 +1,4 @@
+"0","data_sd %>% "
+"0","    ggplot(aes(x = age_diff, y = intel)) + "
+"0","    geom_point(size = .5, alpha = .4) +"
+"0","    geom_count()"

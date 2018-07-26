@@ -1,0 +1,3 @@
+"0","data_sd %>% "
+"0","    ggplot(aes(x = age_diff)) + "
+"0","    geom_histogram(bins = 30, fill = ""white"", color = ""blue"")"

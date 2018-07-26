@@ -1,0 +1,4 @@
+"0","plotly::ggplotly(x)"
+"2","We recommend that you use the dev version of ggplot2 with `ggplotly()`
+Install it with: `devtools::install_github('hadley/ggplot2')`
+"

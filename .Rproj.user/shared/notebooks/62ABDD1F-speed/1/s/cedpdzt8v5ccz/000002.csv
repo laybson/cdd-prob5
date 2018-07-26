@@ -1,0 +1,8 @@
+"0","dados %>% "
+"0","    filter(UF == ""MT"") %>% "
+"0","    ggplot() + "
+"0","    aes(y = votos_log, x = gastos_log) + "
+"0","    geom_point(size = 2, alpha = .6) + "
+"0","    geom_abline(slope = 0, "
+"0","                intercept = 3, "
+"0","                color = ""darkorange"")"

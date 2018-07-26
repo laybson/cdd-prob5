@@ -1,0 +1,6 @@
+"0","pb %>% "
+"0","    add_predictions(model = modelo_pb) %>% "
+"0","    ggplot(aes(x = gastos_log, y = votos_log)) + "
+"0","    geom_point(alpha = 0.4) + "
+"0","    geom_line(aes(y = pred), colour = ""red"") + "
+"0","    NULL"

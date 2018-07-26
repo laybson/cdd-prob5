@@ -1,0 +1,29 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1532606878454.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "C404AC26",
+    "lastKnownWriteTime" : 0,
+    "last_content_update" : 1532606878454,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "952F7E1B",
+        "caption" : "data_sd",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=data_sd&cache_key=952F7E1B",
+        "displayedObservations" : 4918,
+        "environment" : "",
+        "object" : "data_sd",
+        "preview" : 0,
+        "totalObservations" : 4918,
+        "variables" : 43
+    },
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}
