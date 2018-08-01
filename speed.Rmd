@@ -12,25 +12,16 @@ theme: sandstone
 library(tidyverse)
 library(here)
 library(viridis)
-
 library(broom)
 library(modelr)
-
-source(here::here("code/lib.R"))
-theme_set(theme_report())
-
-knitr::opts_chunk$set(tidy = FALSE,
-                      fig.width = 6,
-                      fig.height = 5,
-                      echo = FALSE)
-
-paleta = c("#404E4D",
-           "#92DCE5",
-           "#938BA1",
-           "#2D3142",
-           "#F4743B")
+library(GGally)
+library(caret)
+library(broom)
+library(plotly)
+library(knitr)
+library(DT)
+theme_set(theme_bw())
 ```
-
 
 ```{r}
 data_sd <- read.csv("speed-dating/speed-dating.csv")
@@ -38,235 +29,106 @@ data_sd <- data_sd %>%
   mutate(age_diff = age_o-age)
 ```
 
+## Ser divertido é ser atraente?
+
+É de saber popular que as pessoas se sentem mais atraídas por pessoas que elas consideram divertidas. Isso faz sentido, uma vez que rir faz bem. Mas será que isso reflete a realidade?
+
+Utilizaremos dados advindos de um [estudo](http://faculty.chicagobooth.edu/emir.kamenica/documents/genderDifferences.pdf) feito por professores da Columbia Business School, onde 310 pessoas participaram de 5000 encontros relâmpagos de 4 minutos, e ao final responderam um questionário onde davam notas de 1 a 10 em características dos parceiros, como: aparência, sinceridade, inteligência, diversão, ambição e interesses em comum. Também davam uma nota geral representando o quanto gostou da pessoa, e uma outra representando a probabilidade da receptividade dela quanto a você, além de responder se interesse de a encontrar novamente.
+
+
+
+```{r message=FALSE}
+dados <- data_sd %>%
+  mutate(from = as.numeric(factor(from)),
+         gender = as.numeric(factor(gender)),
+         samerace = as.numeric(factor(samerace)))
+```
+Os dados obtidos correlacionam-se da seguinte forma:
 
 ```{r}
 data_sd %>% 
-    ggplot(aes(x = age_diff)) + 
-    geom_histogram(bins = 30, fill = "white", color = "blue")
+  select(like,fun,amb,attr,
+         sinc,intel,shar) %>% 
+  na.omit() %>%
+  ggcorr(palette = "PuBu", label = TRUE,
+       label_size = 4, nbreaks = 9)
 ```
+
+Vemos que aparentemente os atributos que melhor se relacionam com a variável gostar, nesse encontros rápidos, são diversão, aparência e interesses em comum. Diversão também mostra certa correlação com aparência e interesses em comum.
+
+
+Assim se distribui as notas refentes a o quão divertidos os participantes consideraram o seu parceiro:
 
 
 ```{r}
 data_sd %>% 
-    ggplot(aes(x = intel)) + 
-    geom_histogram(bins = 10, fill = "white", color = "blue")
+    ggplot(aes(x = fun)) + 
+    geom_histogram(bins = 10, fill = "white", color = "blue") +
+    labs(x= "Divertido", y = "Frequência")
 ```
+
+O histograma acima mostra que a maior parte das pessoas deu notas medianas, entre 5 e 8, para a capacidade de seus parceiros em os divertir.
+
+Abaixo, como se distribui as notas do quanto gostaram da outra pessoa.
 
 ```{r}
 data_sd %>% 
-    ggplot(aes(x = age_diff, y = intel)) + 
-    geom_point(size = .5, alpha = .4) +
-    geom_count()
+    ggplot(aes(x = like)) + 
+    geom_histogram(bins = 10, fill = "white", color = "blue") +
+    labs(x= "Quanto gostou", y = "Frequência")
 ```
 
-```{r}
-model_age_intel = lm(age_diff ~ intel, 
-               data = data_sd)
-```
+A distribuição é semelhante à de diversão. 
+
+
+Vamos responder nossa pergunta utilizando um modelo de regressão linear:
 
 ```{r}
-tidy(model_age_intel)
+model <- lm(like ~ fun, data = data_sd)
+
+date_augmented = data_sd %>% 
+  add_predictions(model) %>% 
+  add_residuals(model)
 ```
+Avaliando os resíduos do modelo:
 
 ```{r}
-glance(model_age_intel)
+date_augmented %>% 
+  ggplot(aes(x = fun)) + 
+  geom_jitter(aes(y = resid), colour = "blue", alpha = .1) +
+  labs(x= "Diversão", y = "Resíduo") 
 ```
+
+Observando o gráfico residual, vemos que a maior parte dos erros está entre -3 e 3, dando a entender que o modelo parece representar bem os dados.
+
+```{r}
+tidy(model, conf.int = TRUE) %>% 
+  select(-std.error, -p.value) %>%
+  datatable()
+```
+
+A variável diversão (observada sozinha, sem nos importarmos com os efeitos provocados por outras variáveis, especialmente aparência e interesses em comum, que como visto, também parecem ter muita relação) possui um int_corr de aproximadamente 0.64, logo, a cada ponto que acrescemos na nota de diversão, a nota geral tente a aumentar 0.64.
+Esta estimativa é siginificativa, com 95% de confiança.
+
+
+```{r}
+glance(model) %>%
+  datatable()
+```
+
+O modelo é capaz de representar 58% da variação observada em quanto os parceiros foram gostados, da forma que pode ser observada abaixo:
 
 ```{r}
 data_sd %>% 
-    add_predictions(model = model_age_intel) %>% 
-    ggplot(aes(x = age_diff, y = intel)) + 
+    add_predictions(model = model) %>% 
+    ggplot(aes(x = like, y = fun)) + 
     geom_point(alpha = 0.4) + 
     geom_count() +
-    geom_line(aes(pred), colour = "blue") + 
+    geom_line(aes(pred), colour = "blue") +
+    labs(x= "Gostou", y = "Diversão")  + 
     NULL
 
 ```
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-```{r read}
-dados = read_projectdata()
-```
-
-```{r}
-dados %>% 
-    ggplot(aes(x = total_despesa, y = votos)) + 
-    geom_point(size = .5) + 
-    scale_x_log10() + 
-    scale_y_log10() + 
-    facet_wrap(~ UF)
-```
-
-```{r}
-dados = dados %>% 
-    mutate(votos_log = log10(votos), 
-           gastos_log = log10(total_despesa))
-```
-
-
-```{r}
-pb = dados %>% 
-    filter(UF == "PB") 
-    
-
-pb %>% 
-    ggplot() + 
-    aes(x = votos_log, y = gastos_log) + 
-    geom_point(size = 2, alpha = .6)
-```
-
-**ESCOLHA OS COEFICIENTES DA LINHA ABAIXO PARA ALCANÇAR O MELHOR FIT**
-
-```{r}
-pb %>% 
-    ggplot() + 
-    aes(y = votos_log, x = gastos_log) + 
-    geom_point(size = 2, alpha = .6) + 
-    geom_abline(intercept = -.5, 
-                slope = .95, 
-                color = "darkorange") + 
-    geom_abline(intercept = .18, 
-                slope = .8, 
-                color = "darkgreen") + 
-    NULL
-```
-
-E se os dados fossem de MT? 
-
-```{r}
-dados %>% 
-    filter(UF == "MT") %>% 
-    ggplot() + 
-    aes(y = votos_log, x = gastos_log) + 
-    geom_point(size = 2, alpha = .6) + 
-    geom_abline(slope = 0, 
-                intercept = 3, 
-                color = "darkorange")
-
-```
-
-## Usando o computador para achar a linha
-
-## Na PB
-
-O modelo
-
-```{r}
-modelo_pb = lm(votos_log ~ gastos_log, 
-               data = pb)
-
-tidy(modelo_pb)
-```
-
-Visualizar o modelo
-
-```{r}
-pb %>% 
-    add_predictions(model = modelo_pb) %>% 
-    ggplot(aes(x = gastos_log, y = votos_log)) + 
-    geom_point(alpha = 0.4) + 
-    geom_line(aes(y = pred), colour = "red") + 
-    NULL
-
-```
-
-```{r}
-x = pb %>% 
-    add_residuals(model = modelo_pb) %>% 
-    ggplot(aes(x = gastos_log, y = resid, label = nome)) + 
-    geom_point(alpha = 0.4, size = 3) + 
-    geom_hline(yintercept = 0)
-
-x
-
-plotly::ggplotly(x)
-```
-
-
-A qualidade do ajuste (fit)
-
-```{r}
-glance(modelo_pb)
-```
-
-## E no MT? 
-
-```{r}
-
-```
-
-
-Ao final, você deve conseguir preencher o seguinte texto: 
-
-> Regressão linear (via mínimos quadrados ordinários) foi utilizada para analisar se <VarIndep1> tem uma associação (significativa -- se fosse inferência) com <VarDep>. Os resultados da regressão indicam que o modelo com preditor no formato <VarDep> = <XXX>.VarIndep1 + <Intercept> explica <XX,XX>% da variância da variável de resposta (R2 = <XX,XX>). <VarIndep1>, medida como/em [unidade ou escala] tem uma relação com <VarDep> (b = <YY>) tal que o aumento de 1 unidade de VarIndep1 produz uma mudança de xxx em <VarDep>.
-
----
-
-# Múltiplas variáveis preditoras
-
-```{r}
-modelo_pb = lm(votos_log ~ gastos_log + sexo, data = pb)
-
-tidy(modelo_pb)
-```
-
-Visualizar o modelo
-
-```{r}
-pb %>% 
-    add_predictions(model = modelo_pb) %>% 
-    ggplot(aes(x = gastos_log, 
-               y = votos_log, 
-               group = sexo, 
-               color = sexo)) + 
-    geom_point(alpha = 0.4) + 
-    geom_line(aes(y = pred, color = sexo))  
-```
-
-```{r}
-x = pb %>% 
-    add_residuals(model = modelo_pb) %>% 
-    ggplot(aes(x = gastos_log, y = resid, label = nome)) + 
-    geom_point(alpha = 0.4, size = 3) + 
-    geom_hline(yintercept = 0)
-
-x
-
-plotly::ggplotly(x)
-```
-
-
-A qualidade do ajuste (fit)
-
-```{r}
-glance(modelo_pb)
-```
-
-## E em outro estado? 
-
-```{r}
-
-```
+Logo, sim! O mundo está certo! Ser divertido parece ser muito importante para atraírmos parceiros.
 
