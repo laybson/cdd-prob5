@@ -1,3 +1,0 @@
-"0","data_sd %>% "
-"0","    ggplot(aes(x = intel)) + "
-"0","    geom_histogram(bins = 10, fill = ""white"", color = ""blue"")"

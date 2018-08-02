@@ -1,0 +1,82 @@
+---
+title: "speed-dating-2"
+author: "laybson"
+date: "2 de agosto de 2018"
+output: html_document
+---
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+library(GGally)
+library(pscl)
+library(broom)
+library(tidyverse)
+library(modelr)
+theme_set(theme_bw())
+```
+
+```{r}
+data_sd <- read.csv("speed-dating/speed-dating2.csv")
+data_sd <- data_sd %>%
+  mutate(age_diff = age_o-age, 
+         dec = ifelse(dec == "yes",1,0))
+```
+
+
+1. Dentre os fatores que você acha que podem ter efeito no match, quais fatores têm efeito significativo na chance de p1 decidir se encontrar novamente com p2? E como é esse efeito (positivo/negativo)?
+
+2. Que fatores nos dados têm mais efeito na chance de um participante querer se encontrar novamente com outro?
+
+p(dec=1)~int+attr+like
+
+```{r}
+data_sd %>% 
+  select(like,fun,amb,attr,sinc,intel,shar,dec) %>% 
+  na.omit() %>%
+  ggcorr(palette = "PuBu", label = TRUE,
+       label_size = 4, nbreaks = 9)
+```
+
+
+```{r}
+model <- lm(dec ~ fun+attr+shar+like, data = data_sd)
+
+date_augmented = data_sd %>% 
+  add_predictions(model) %>% 
+  add_residuals(model)
+```
+
+```{r}
+tidy(model, conf.int = TRUE) %>% 
+  select(-std.error, -p.value)
+```
+
+```{r}
+glance(model)
+```
+
+```{r}
+data_sd_t = data_sd %>%
+  mutate(dec = as.factor(dec))
+  
+bm <- glm(dec ~ fun+attr+shar+like, 
+          data = data_sd_t, 
+          family = "binomial")
+
+tidy(bm, conf.int = TRUE) %>% 
+  select(-statistic, -p.value)
+# EXPONENCIANDO:
+tidy(bm, conf.int = TRUE, exponentiate = TRUE) %>% 
+  select(-statistic, -p.value)
+## Como aqui y = exp(b0)*exp(b1*x1), aumentar em uma unidade x, faz com que y seja multiplicado por exp(b1), que é o estimate nessa tabela acima
+
+```
+
+```{r}
+bm %>% 
+  augment(type.predict = "response")  %>% 
+  mutate(decNum = ifelse(dec == "1", 1, 0)) %>% 
+  ggplot(aes(x = like)) + 
+  geom_count(aes(y = decNum), alpha = 0.5) + 
+  geom_line(aes(y = .fitted))
+```
+

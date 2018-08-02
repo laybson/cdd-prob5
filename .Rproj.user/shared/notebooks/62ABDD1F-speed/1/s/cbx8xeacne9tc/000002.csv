@@ -1,6 +1,0 @@
-"0","dados %>% "
-"0","    ggplot(aes(x = total_despesa, y = votos)) + "
-"0","    geom_point(size = .5) + "
-"0","    scale_x_log10() +"
-"0","    scale_y_log10() +"
-"0","    NULL"

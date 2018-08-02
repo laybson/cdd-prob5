@@ -1,6 +1,0 @@
-"0","x = pb %>% "
-"0","    add_residuals(model = modelo_pb) %>% "
-"0","    ggplot(aes(x = gastos_log, y = resid, label = nome)) + "
-"0","    geom_point(alpha = 0.4, size = 3) + "
-"0","    geom_hline(yintercept = 0)"
-"0","x"

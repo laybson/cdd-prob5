@@ -1,4 +1,0 @@
-"0","dados %>% "
-"0","    ggplot(aes(x = sexo, y = votos)) + "
-"0","    geom_boxplot() + "
-"0","    scale_y_log10()"

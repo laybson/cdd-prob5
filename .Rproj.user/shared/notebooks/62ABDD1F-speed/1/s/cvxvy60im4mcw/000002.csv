@@ -1,3 +1,0 @@
-"0","data_sd <- read.csv(""speed-dating/speed-dating.csv"")"
-"0","data_sd <- data_sd %>%"
-"0","  mutate(age_diff = age_o-age)"

@@ -1,2 +1,0 @@
-"0","modelo_pb = lm(votos_log ~ gastos_log + sexo, data = pb)"
-"0","tidy(modelo_pb)"

@@ -1,4 +1,0 @@
-"0","dados %>% "
-"0","    ggplot(aes(x = idade, y = votos_prop)) + "
-"0","    geom_point(size = .5, alpha = .4) + "
-"0","    scale_y_log10()"

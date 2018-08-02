@@ -1,7 +1,0 @@
-"0","pb = dados %>% "
-"0","    filter(UF == ""PB"") "
-"0","    "
-"0","pb %>% "
-"0","    ggplot() + "
-"0","    aes(x = votos_log, y = gastos_log) + "
-"0","    geom_point(size = 2, alpha = .6)"

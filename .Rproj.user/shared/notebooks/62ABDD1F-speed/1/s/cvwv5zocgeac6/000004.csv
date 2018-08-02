@@ -1,4 +1,0 @@
-"0","dados %>% "
-"0","    ggplot(aes(x = total_despesa)) + "
-"0","    geom_histogram(bins = 30, fill = ""white"", color = ""blue"") + "
-"0","    scale_x_log10()"

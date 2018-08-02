@@ -1,3 +1,0 @@
-"0","modelo_pb = lm(votos_log ~ gastos_log, "
-"0","               data = pb)"
-"0","tidy(modelo_pb)"

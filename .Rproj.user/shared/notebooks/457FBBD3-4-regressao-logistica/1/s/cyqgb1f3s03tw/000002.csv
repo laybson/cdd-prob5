@@ -1,8 +1,0 @@
-"0","```r
-# coeficiente negativo: 
-py_dado_x = minha_logit(1.2, -1.3, x)
-data.frame(x, py_dado_x) %>% 
-  ggplot(aes(x, py_dado_x)) + 
-  geom_point() + 
-  geom_line()
-```"
